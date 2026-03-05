@@ -1,0 +1,109 @@
+{# 1. HERENCIA Y TÍTULO DINÁMICO #}
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    {{ modo_edicion|default(false) ? 'Editar: ' ~ paciente.nombre : 'Nuevo Registro de Paciente' }}
+{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-9">
+
+            {# BOTÓN VOLVER #}
+            <div class="mb-3">
+                <a href="{{ path('app_paciente_listado') }}" class="text-decoration-none text-muted small">
+                    <i class="fas fa-chevron-left"></i> Volver al listado central
+                </a>
+            </div>
+
+            <div class="card shadow-lg border-0">
+                {# 2. CABECERA DINÁMICA SEGÚN EL MODO #}
+                <div class="card-header py-3 {{ modo_edicion|default(false) ? 'bg-warning text-dark' : 'bg-primary text-white' }}">
+                    <h4 class="mb-0">
+                        <i class="fas {{ modo_edicion|default(false) ? 'fa-user-edit' : 'fa-hospital-user' }} me-2"></i>
+                        {{ modo_edicion|default(false) ? 'Modificar ficha de: ' ~ paciente.nombre : 'Alta de Nuevo Paciente' }}
+                    </h4>
+                </div>
+
+                <div class="card-body p-5">
+                    {# form_start renderiza la etiqueta <form> y el token de seguridad CSRF automáticamente #}
+                    {{ form_start(formulario_paciente, {'attr': {'novalidate': 'novalidate'}}) }}
+
+                        {# SECCIÓN 1: IDENTIDAD #}
+                        <h6 class="text-uppercase text-secondary fw-bold mb-3 border-bottom pb-2">
+                            <i class="fas fa-id-card me-2"></i>Información de Identidad
+                        </h6>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                {{ form_label(formulario_paciente.nombre, 'Nombre del Paciente', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(formulario_paciente.nombre, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Juan'}}) }}
+                                <div class="text-danger small">{{ form_errors(formulario_paciente.nombre) }}</div>
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_label(formulario_paciente.apellidos, 'Apellidos Completos', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(formulario_paciente.apellidos, {'attr': {'class': 'form-control', 'placeholder': 'Ej: Pérez García'}}) }}
+                                <div class="text-danger small">{{ form_errors(formulario_paciente.apellidos) }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form_label(formulario_paciente.dni, 'DNI / NIE', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(formulario_paciente.dni, {'attr': {'class': 'form-control', 'placeholder': '12345678X'}}) }}
+                                <div class="text-danger small">{{ form_errors(formulario_paciente.dni) }}</div>
+                            </div>
+                            <div class="col-md-4">
+                                {{ form_label(formulario_paciente.telefono, 'Teléfono de Contacto', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(formulario_paciente.telefono, {'attr': {'class': 'form-control', 'placeholder': '600 000 000'}}) }}
+                            </div>
+                            <div class="col-md-4">
+                                {{ form_label(formulario_paciente.fechaNacimiento, 'Fecha de Nacimiento', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                {{ form_widget(formulario_paciente.fechaNacimiento, {'attr': {'class': 'form-control'}}) }}
+                            </div>
+                        </div>
+
+                        {# SECCIÓN 2: CLÍNICA #}
+                        <h6 class="text-uppercase text-secondary fw-bold mb-3 border-bottom pb-2 mt-4">
+                            <i class="fas fa-notes-medical me-2"></i>Información Clínica Sensible
+                        </h6>
+                        <div class="mb-4">
+                            {{ form_label(formulario_paciente.historialClinico, 'Notas y Observaciones', {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                            {{ form_widget(formulario_paciente.historialClinico, {
+                                'attr': {
+                                    'class': 'form-control',
+                                    'rows': '6',
+                                    'placeholder': 'Describa alergias, medicación actual, antecedentes familiares...'
+                                }
+                            }) }}
+                            <div class="form-text mt-2">
+                                <i class="fas fa-exclamation-triangle text-warning me-1"></i>
+                                Estos datos solo serán visibles para personal autorizado con ROLE_MEDICO.
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        {# 3. BOTONERA FINAL #}
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ path('app_paciente_listado') }}" class="btn btn-outline-secondary px-4">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+
+                            <button type="submit" class="btn {{ modo_edicion|default(false) ? 'btn-warning' : 'btn-success' }} px-5 shadow">
+                                <i class="fas {{ modo_edicion|default(false) ? 'fa-check-double' : 'fa-save' }} me-2"></i>
+                                {{ modo_edicion|default(false) ? 'Confirmar Cambios' : 'Finalizar Registro' }}
+                            </button>
+                        </div>
+
+                    {# form_end cierra el formulario y renderiza campos ocultos restantes #}
+                    {{ form_end(formulario_paciente) }}
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <span class="badge bg-light text-dark border p-2">
+                    <i class="fas fa-shield-alt text-success me-1"></i> Conexión Segura - Registro de Auditoría Activo
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

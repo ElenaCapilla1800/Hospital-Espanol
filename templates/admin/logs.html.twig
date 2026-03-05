@@ -1,0 +1,120 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Auditoría de Accesos{% endblock %}
+
+{% block body %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🛡️ Registro de Auditoría</h1>
+        <div>
+            {# --- BOTONES DE EXPORTACIÓN DINÁMICOS (Punto 24) --- #}
+            {# Enviamos los filtros actuales a las rutas de exportación para que el informe coincida con la vista #}
+            <div class="btn-group me-2">
+                <a href="{{ path('app_admin_reporte_pdf', { 'usuario': filtro_usuario, 'fecha': filtro_fecha, 'accion': filtro_accion }) }}"
+                    class="btn btn-outline-danger">📥 Descargar PDF</a>
+
+                <a href="{{ path('app_admin_reporte_excel', { 'usuario': filtro_usuario, 'fecha': filtro_fecha, 'accion': filtro_accion }) }}"
+                    class="btn btn-outline-success">📥 Descargar Excel</a>
+            </div>
+
+            <span class="badge bg-secondary">{{ logs|length }} registros mostrados</span>
+
+            {# Indicador de alertas recientes #}
+            {% if sospechosos|length > 0 %}
+                <span class="badge bg-danger animate-pulse">⚠️ {{ sospechosos|length }} ALERTAS RECIENTES</span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# --- FORMULARIO DE FILTROS (Punto 19) --- #}
+    <div class="card mb-4 bg-light shadow-sm">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-3 text-muted">Filtrar historial de seguridad:</h6>
+            <form method="get" class="row g-3">
+                <div class="col-md-3">
+                    <label class="small text-muted">Email de usuario</label>
+                    <input type="text" name="usuario" class="form-control" placeholder="Ej: medico@hospital.com" value="{{ filtro_usuario }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="small text-muted">Fecha del evento</label>
+                    <input type="date" name="fecha" class="form-control" value="{{ filtro_fecha }}">
+                </div>
+                <div class="col-md-3">
+                    <label class="small text-muted">Acción realizada</label>
+                    <input type="text" name="accion" class="form-control" placeholder="Ej: LOGIN, VER_PACIENTE" value="{{ filtro_accion }}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">🔍 Aplicar Filtros</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# --- PANEL DE ALERTAS DE SEGURIDAD (Punto 24) --- #}
+    {% if sospechosos|length > 0 %}
+        <div class="alert alert-warning border-danger shadow-sm mb-4" role="alert">
+            <h4 class="alert-heading">🚨 Actividad Sospechosa Detectada (24h)</h4>
+            <p>Se han registrado <strong>{{ sospechosos|length }} intentos fallidos</strong>. Esto puede indicar un ataque de fuerza bruta o accesos no autorizados.</p>
+            <hr>
+            <p class="mb-0 small text-danger">Las filas marcadas en <strong>rojo</strong> en la tabla inferior detallan estos incidentes.</p>
+        </div>
+    {% endif %}
+
+    {# --- TABLA DE RESULTADOS --- #}
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Movimientos del Sistema</h5>
+            {# Botón para resetear la búsqueda rápidamente #}
+            {% if filtro_usuario or filtro_fecha or filtro_accion %}
+                <a href="{{ path('app_admin_logs') }}" class="btn btn-sm btn-outline-light">🔄 Limpiar Búsqueda</a>
+            {% endif %}
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 180px;">Fecha y Hora</th>
+                            <th>Usuario (Identificador)</th>
+                            <th>Acción / Recurso</th>
+                            <th>IP de Origen</th>
+                            <th class="text-center">Resultado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for log in logs %}
+                        {# Resaltamos en rojo los accesos denegados para facilitar la auditoría visual #}
+                        <tr class="{{ not log.exito ? 'table-danger' : '' }}">
+                            <td class="text-nowrap">{{ log.fecha|date('d/m/Y H:i:s') }}</td>
+                            <td class="fw-bold">{{ log.usuarioEmail }}</td>
+                            <td><span class="badge bg-light text-dark border">{{ log.accion }}</span></td>
+                            <td><code>{{ log.ip }}</code></td>
+                            <td class="text-center">
+                                {% if log.exito %}
+                                    <span class="badge bg-success shadow-sm">EXITOSO</span>
+                                {% else %}
+                                    <span class="badge bg-danger shadow-sm">DENEGADO</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">
+                                <p class="mb-0">🚫 No hay registros que coincidan con los criterios de búsqueda.</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# Estilo para que la alerta de seguridad llame la atención #}
+<style>
+    .animate-pulse { animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+    .table-danger td { color: #842029; }
+</style>
+{% endblock %}

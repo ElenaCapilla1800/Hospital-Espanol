@@ -1,0 +1,44 @@
+# config/packages/nelmio_api_doc.yaml
+nelmio_api_doc:
+    areas:
+        path_patterns:
+            - ^/api(?!/doc$)
+    documentation:
+        info:
+            title: API Hospital
+            description: Gestión de pacientes y seguridad JWT
+            version: 1.0.0
+        paths:
+            # Aquí "creamos" manualmente el endpoint de login para Swagger
+            /api/login_check:
+                post:
+                    operationId: postLoginCheck
+                    summary: Obtener Token JWT
+                    description: Envía email y password para recibir el token de acceso.
+                    tags:
+                        - Seguridad
+                    requestBody:
+                        content:
+                            application/json:
+                                schema:
+                                    type: object
+                                    properties:
+                                        username: { type: string, example: admin@hospital.es }
+                                        password: { type: string, example: admin123 }
+                    responses:
+                        200:
+                            description: Token generado con éxito
+                            content:
+                                application/json:
+                                    schema:
+                                        type: object
+                                        properties:
+                                            token: { type: string }
+        components:
+            securitySchemes:
+                Bearer:
+                    type: http
+                    scheme: bearer
+                    bearerFormat: JWT
+        security:
+            - Bearer: []

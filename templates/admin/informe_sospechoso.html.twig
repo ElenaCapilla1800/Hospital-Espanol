@@ -1,0 +1,47 @@
+{# templates/admin/informe_sospechoso.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Informe de Seguridad{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>🚨 Informe de Accesos Sospechosos</h1>
+        <a href="{{ path('app_admin_logs') }}" class="btn btn-secondary">Volver al Historial</a>
+    </div>
+
+    <div class="card border-danger shadow">
+        <div class="card-header bg-danger text-white">
+            <strong>Intentos fallidos registrados en las últimas 24 horas</strong>
+        </div>
+        <div class="card-body">
+            {% if alertas|length > 0 %}
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Fecha y Hora</th>
+                            <th>Usuario/Email afectado</th>
+                            <th>Acción intentada</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alerta in alertas %}
+                            <tr class="table-warning">
+                                <td>{{ alerta.fecha|date('d/m/Y H:i:s') }}</td>
+                                <td><strong>{{ alerta.usuario }}</strong></td>
+                                <td>{{ alerta.accion }}</td>
+                                <td><span class="badge bg-danger">DENEGADO / FALLIDO</span></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="alert alert-success m-0">
+                    ✅ No se han detectado actividades sospechosas en las últimas 24 horas.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

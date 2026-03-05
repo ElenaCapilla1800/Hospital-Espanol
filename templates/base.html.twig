@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Hospital ECS{% endblock %}</title>
+        {# Icono del hospital #}
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2290%22>🏥</text></svg>">
+
+        {# Bootstrap CSS #}
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="{{ path('app_inicio') }}">Hospital 🇪🇸</a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('app_inicio') }}">Inicio</a>
+                        </li>
+
+                        {# 1. MENÚ PARA MÉDICOS: Gestión de Pacientes #}
+                        {% if is_granted('ROLE_MEDICO') %}
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="menuPacientes" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Pacientes
+                                </a>
+                                <ul class="dropdown-menu shadow" aria-labelledby="menuPacientes">
+                                    <li><a class="dropdown-item" href="{{ path('app_paciente_listado') }}">📋 Ver Listado</a></li>
+                                    <li><a class="dropdown-item" href="{{ path('app_paciente_nuevo') }}">➕ Registrar Nuevo</a></li>
+                                </ul>
+                            </li>
+                        {% endif %}
+
+                        {# 2. MENÚ PARA ADMINISTRADORES: Auditoría y Logs (Tarea 4 - Punto 18) #}
+                        {# Solo se muestra si el usuario tiene el rol de administrador #}
+                        {% if is_granted('ROLE_ADMIN') %}
+                            <li class="nav-item">
+                                <a class="nav-link text-warning fw-bold" href="{{ path('app_admin_logs') }}">
+                                    🛡️ Auditoría
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+
+                    {# SECCIÓN DE USUARIO #}
+                    <div class="d-flex align-items-center text-white">
+                        {% if app.user %}
+                            <div class="me-3 text-end">
+                                <small class="d-block text-muted">Conectado como:</small>
+                                <span class="fw-bold">👤 {{ app.user.nombreCompleto }}</span>
+                                <span class="badge bg-info text-dark ms-1">
+                                    {{ app.user.roles[0]|replace({'ROLE_': ''}) }}
+                                </span>
+                            </div>
+                            <a href="{{ path('app_logout') }}" class="btn btn-outline-danger btn-sm">Cerrar Sesión</a>
+                        {% else %}
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-success btn-sm">Iniciar Sesión</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        {# Bloque para mensajes Flash (notificaciones de éxito/error) #}
+        <div class="container">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+        </div>
+
+        {# Bootstrap Bundle con Popper.js #}
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        {% block javascripts %}{% endblock %}
+    </body>
+</html>

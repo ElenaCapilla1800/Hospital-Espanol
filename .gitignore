@@ -1,0 +1,16 @@
+
+# Ignorar archivos de configuración local (seguridad)
+/.env.local
+/.env.local.php
+/.env.*.local
+
+# Ignorar las llaves físicas de la API (seguridad)
+/config/jwt/*.pem
+
+# Carpeta de dependencias y archivos temporales
+/vendor/
+/var/
+/.phpunit.result.cache
+
+# Archivos de entorno de DDEV
+.ddev/

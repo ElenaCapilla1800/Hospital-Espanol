@@ -1,0 +1,20 @@
+[
+  {
+    "id": 3,
+    "nombre_completo": "Juan Pérez Feo",
+    "dni": "79256412E",
+    "fecha_nac": "06/04/2001"
+  },
+  {
+    "id": 4,
+    "nombre_completo": "María Pepa Bueno",
+    "dni": "789654123F",
+    "fecha_nac": "07/12/1977"
+  },
+  {
+    "id": 5,
+    "nombre_completo": "Loli Casillas Prieto",
+    "dni": "145236987T",
+    "fecha_nac": "22/06/1983"
+  }
+]

@@ -1,0 +1,91 @@
+# config/packages/security.yaml
+
+security:
+    # 1. CIFRADO DE CONTRASEÑAS
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # 2. PROVEEDOR DE USUARIOS
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\Usuario
+                property: email
+
+    # 3. JERARQUÍA DE ROLES
+    role_hierarchy:
+        ROLE_ENFERMERO:   ROLE_USER
+        ROLE_MEDICO:      ROLE_ENFERMERO
+        ROLE_ADMIN:       [ROLE_MEDICO, ROLE_ALLOWED_TO_SWITCH]
+
+    # 4. MUROS DE SEGURIDAD (FIREWALLS)
+    firewalls:
+        dev:
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+
+        # --- CONFIGURACIÓN DE LA API (TAREA 6) ---
+        api:
+            pattern: ^/api
+            stateless: true
+            entry_point: jwt
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            jwt: ~
+
+        # --- FIREWALL PRINCIPAL PARA LA WEB ---
+        main:
+            lazy: true
+            provider: app_user_provider
+            entry_point: App\Security\AutenticadorLoginAuthenticator
+
+            # TAREA 5 - PUNTO 20: RATE LIMITING (Login Throttling)
+            # Evita ataques de fuerza bruta limitando los intentos de acceso.
+            # login_throttling:
+                # max_attempts: 5          # Bloquea tras 5 intentos fallidos
+                # interval: '15 minutes'   # Tiempo de espera hasta el próximo intento
+                # Symfony usa internamente el "limiter" para rastrear la IP o el Usuario.
+
+            custom_authenticator: App\Security\AutenticadorLoginAuthenticator
+
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                enable_csrf: true       # TAREA 5 - PUNTO 21: Protección contra ataques CSRF activa
+
+            logout:
+                path: app_logout
+                target: app_login
+
+            remember_me:
+                secret:   '%kernel.secret%'
+                lifetime: 604800
+                path:     /
+
+    # 5. CONTROL DE ACCESO (REGLAS DE TRÁFICO)
+    # El orden es vital: Symfony lee de arriba a abajo y se queda con la primera coincidencia.
+    access_control:
+        # PÚBLICO: Documentación de la API (Swagger) y Login de la API
+        - { path: ^/api/doc, roles: PUBLIC_ACCESS }
+        - { path: ^/api/login_check, roles: PUBLIC_ACCESS }
+
+        # PROTEGIDO: El resto de la API requiere autenticación JWT (TAREA 6)
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+
+        # REGLAS WEB POR ROLES (TAREA 3)
+        - { path: ^/admin, roles: ROLE_ADMIN }       # Solo Administradores (Auditoría)
+        - { path: ^/paciente, roles: ROLE_MEDICO }    # Médicos y superiores
+        - { path: ^/inicio, roles: ROLE_USER }       # Cualquier usuario autenticado
+        - { path: ^/login, roles: PUBLIC_ACCESS }    # Acceso público al formulario
+
+# CONFIGURACIÓN OPTIMIZADA PARA TESTS
+when@test:
+    security:
+        password_hashers:
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Reduce el coste computacional para que los tests corran rápido
+                time_cost: 3
+                memory_cost: 10

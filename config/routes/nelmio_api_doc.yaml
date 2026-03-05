@@ -1,0 +1,16 @@
+# -------------------------------------------------------------------------
+# CONFIGURACIÓN DE RUTAS PARA LA DOCUMENTACIÓN DE LA API (SWAGGER)
+# -------------------------------------------------------------------------
+
+# Esta ruta es la que carga la interfaz visual (la página web azul y blanca)
+app.swagger_ui:
+    path: /api/doc
+    methods: [GET]
+    defaults: { _controller: nelmio_api_doc.controller.swagger_ui }
+
+# Esta ruta es opcional pero muy recomendada: devuelve la documentación en formato JSON
+# Es útil si quieres importar tu API en Postman o herramientas externas
+app.swagger_json:
+    path: /api/doc.json
+    methods: [GET]
+    defaults: { _controller: nelmio_api_doc.controller.swagger_json }

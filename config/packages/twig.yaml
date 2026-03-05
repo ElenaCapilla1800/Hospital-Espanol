@@ -1,0 +1,17 @@
+# -------------------------------------------------------------------------
+# CONFIGURACIÓN DEL MOTOR DE PLANTILLAS TWIG
+# -------------------------------------------------------------------------
+twig:
+    # Esta línea es VITAL para Swagger: le dice a Symfony dónde buscar
+    # las plantillas HTML de tu proyecto y de los bundles instalados.
+    default_path: '%kernel.project_dir%/templates'
+
+    # Indica que todos los archivos que terminen en .twig se traten como plantillas.
+    file_name_pattern: '*.twig'
+
+# Configuración específica para el entorno de pruebas (test)
+when@test:
+    twig:
+        # En modo test, si intentas usar una variable que no existe,
+        # Symfony lanzará un error en lugar de ignorarlo. Esto ayuda a depurar.
+        strict_variables: true

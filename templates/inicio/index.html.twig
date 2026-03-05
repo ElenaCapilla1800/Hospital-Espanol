@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Panel de Control - Hospital{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12 text-center mb-5">
+            <h1 class="display-4">Bienvenido, {{ app.user.nombreCompleto }}</h1>
+            <p class="lead text-muted">Panel de Gestión Hospitalaria</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        {# Tarjeta 1: Ver Listado #}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3">👥</div>
+                    <h5 class="card-title">Gestión de Pacientes</h5>
+                    <p class="card-text">Consulta la lista completa de pacientes y sus historiales.</p>
+                    <a href="{{ path('app_paciente_listado') }}" class="btn btn-outline-primary">Ir al Listado</a>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta 2: Botón de "Pánico" (Nuevo Paciente rápido) #}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow border-0 bg-primary text-white">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3 text-white">➕</div>
+                    <h5 class="card-title">Nuevo Registro</h5>
+                    <p class="card-text">Alta rápida de pacientes para urgencias o nuevas consultas.</p>
+                    <a href="{{ path('app_paciente_nuevo') }}" class="btn btn-light fw-bold">Registrar Ahora</a>
+                </div>
+            </div>
+        </div>
+
+        {# Tarjeta 3: Futuras Citas #}
+        <div class="col-md-6 col-lg-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-body text-center">
+                    <div class="display-5 mb-3">📅</div>
+                    <h5 class="card-title">Agenda</h5>
+                    <p class="card-text">Consulta las citas programadas para el día de hoy.</p>
+                    <button class="btn btn-outline-secondary" disabled>Próximamente</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

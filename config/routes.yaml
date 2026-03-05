@@ -1,0 +1,19 @@
+# config/routes.yaml
+
+# 1. IMPORTACIÓN AUTOMÁTICA DE CONTROLADORES
+# Esta sección le dice a Symfony que busque todos los atributos #[Route]
+# que hemos escrito en src/Controller/ (como AdminController, PacienteController, etc.)
+controllers:
+    resource: ../src/Controller/
+    type: attribute
+
+# 2. RUTA PARA AUTENTICACIÓN DE LA API (Tarea 6)
+# Este es el "Check Point" donde las aplicaciones externas (Postman, Apps móviles)
+# enviarán el email y password en formato JSON para obtener su Token JWT.
+# NOTA: No creamos un controlador para esto, el bundle LexikJWT se encarga de todo.
+api_login_check:
+    path: /api/login_check
+    methods: [POST]
+
+# 3. (Opcional) Si tienes rutas anotadas en otros directorios, podrías añadirlas aquí.
+# Por ahora, con la importación de 'controllers' es suficiente.
